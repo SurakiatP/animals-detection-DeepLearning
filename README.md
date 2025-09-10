@@ -257,20 +257,6 @@ Access InfluxDB UI at: `http://localhost:8086`
 - Username: admin
 - Password: password123
 
-## System Requirements
-
-### Minimum Requirements:
-- CPU: Intel i5 or AMD Ryzen 5
-- RAM: 8GB
-- GPU: GTX 1660 (4GB VRAM)
-- Storage: 2GB free space
-
-### Recommended Requirements:
-- CPU: Intel i7 or AMD Ryzen 7
-- RAM: 16GB
-- GPU: RTX 3060 (6GB VRAM+)
-- Storage: 5GB free space
-
 ## Performance
 
 - **Processing Speed**: 25-120 FPS (depending on hardware)
