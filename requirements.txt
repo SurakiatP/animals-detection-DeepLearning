@@ -1,0 +1,22 @@
+# Core ML/CV
+ultralytics>=8.0.0
+opencv-python>=4.8.0
+torch>=2.0.0
+torchvision>=0.15.0
+
+# Data & Database
+influxdb-client>=1.36.0
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Visualization & Dashboard  
+streamlit>=1.28.0
+plotly>=5.15.0
+
+# Configuration
+PyYAML>=6.0
+python-dateutil>=2.8.2
+
+# Optional: Performance monitoring
+psutil>=5.9.0
+pytz>=2023.3
