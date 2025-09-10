@@ -29,12 +29,12 @@ animals:
 
 influxdb:
   url: "http://localhost:8086"
-  token: "_YQXlcRr6ddP8pT_QeRkeeks8tX3L8ElCgE4Je5Eq-P4Nh7-hfPhXdYTDcbxV7efEUOqnbZ3JHuVhrLVQkV2KA=="
+  token: "your-infulxdb-token"
   org: "zoo-monitoring"
   bucket: "animal-detection"
 
 video:
-  source: "data/videos/test_zebra.mp4" # 0 for webcam, or path to video file
+  source: "path-to-your-video" # 0 for webcam, or path to video file
   save_output: true
   output_path: "output/detected_video.mp4"
 
