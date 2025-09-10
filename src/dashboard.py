@@ -28,12 +28,12 @@ class RealDataDashboard:
             initial_sidebar_state="expanded"
         )
         
-        # โหลด config
+        # load config
         try:
             self.config = load_config("config/config.yaml")
             self.db = SimpleInfluxDB()
             
-            # เตรียมข้อมูลสัตว์
+            # Prepare animal information
             self.animals_data = {}
             for animal in self.config['animals']['classes']:
                 self.animals_data[animal['name']] = {
@@ -87,7 +87,7 @@ class RealDataDashboard:
             
             st.markdown("---")
             
-            # แสดงข้อมูล COCO classes
+            # Show COCO classes
             st.subheader("🎯 Target Animals (COCO)")
             for name, data in self.animals_data.items():
                 st.write(f"**{name}** - ID: {data['coco_id']}")  
@@ -134,15 +134,15 @@ class RealDataDashboard:
             st.rerun()
     
     def get_real_animal_counts(self, hours):
-        """ดึงข้อมูลจำนวนสัตว์จริงจาก InfluxDB"""
+        """Retrieve the actual animal count data from InfluxDB."""
         try:
-            # ดึงข้อมูลจาก database
+            # Retrieve data from database
             result = self.db.get_animal_history(hours)
             
             if result is None:
                 return self.get_sample_data()
             
-            # แปลงข้อมูลเป็น DataFrame
+            # Transform data to DataFrame
             data_points = []
             for table in result:
                 for record in table.records:
@@ -157,10 +157,10 @@ class RealDataDashboard:
             
             df = pd.DataFrame(data_points)
             
-            # คำนวณจำนวนสัตว์แต่ละประเภท (เอาค่าสูงสุด)
+            # Calculate the number of each type of animal (take the highest value)
             latest_counts = df.groupby('animal_type')['count'].max().to_dict()
             
-            # เติมค่า 0 สำหรับสัตว์ที่ไม่มีข้อมูล
+            # Add 0 for animals with no data.
             animal_counts = {}
             for animal_name in self.animals_data.keys():
                 animal_counts[animal_name] = latest_counts.get(animal_name, 0)
@@ -173,7 +173,7 @@ class RealDataDashboard:
             return self.get_sample_data()
     
     def get_sample_data(self):
-        """ข้อมูลตัวอย่างเมื่อไม่สามารถเชื่อมต่อ database ได้"""
+        """Sample data when unable to connect to database"""
         sample_counts = {
             'horse':int(np.random.randint(20, 30)),
             'sheep': int(np.random.randint(15, 25)),
@@ -184,7 +184,7 @@ class RealDataDashboard:
             'giraffe': int(np.random.randint(4, 10))
         }
         
-        # สร้าง DataFrame ตัวอย่าง
+        # Build sample DataFrame
         times = pd.date_range(end=datetime.now(), periods=20, freq='3T')
         sample_data = []
         
@@ -194,24 +194,24 @@ class RealDataDashboard:
                 sample_data.append({
                     'time': time,
                     'animal_type': animal,
-                    'count': max(0, count)  # ไม่ให้ติดลบ
+                    'count': max(0, count)
                 })
         
         df = pd.DataFrame(sample_data)
         return sample_counts, df
     
     def show_current_stats(self, hours):
-        """แสดงสถิติปัจจุบันจากข้อมูลจริง"""
+        """Show current statistics from real data"""
         st.subheader("📊 Current Detection Statistics")
         
-        # ดึงข้อมูลจริง
+        # Extract real data
         animal_counts, df = self.get_real_animal_counts(hours)
         
-        # คำนวณสถิติ
+        # Calculate statistics
         total_animals = int(sum(animal_counts.values()))
         active_types = len([count for count in animal_counts.values() if count > 0])
         
-        # ดึงข้อมูล performance
+        # Extract real performance
         try:
             perf_result = self.db.get_performance_stats(1)  # Last hour
             avg_fps = 28.5  # Default
@@ -235,7 +235,7 @@ class RealDataDashboard:
             st.metric(
                 "Total Animals", 
                 f"{total_animals}",
-                delta=f"+{np.random.randint(0, 10)}"  # จำลอง delta
+                delta=f"+{np.random.randint(0, 10)}"  # delta simulator
             )
         
         with col2:
@@ -261,16 +261,16 @@ class RealDataDashboard:
             )
     
     def show_real_charts(self, hours):
-        """แสดงกราฟจากข้อมูลจริง"""
+        """Show graphs from real data"""
         st.subheader("📈 Animal Detection Trends (Real Data)")
         
-        # ดึงข้อมูลจริง
+        # Extract Real data
         animal_counts, df = self.get_real_animal_counts(hours)
         
         col1, col2 = st.columns(2)
         
         with col1:
-            # Bar chart จากข้อมูลจริง
+            # Bar chart from real data
             if animal_counts:
                 animals = []
                 counts = []
@@ -283,7 +283,7 @@ class RealDataDashboard:
                 fig_bar = px.bar(
                     x=animals, 
                     y=counts,
-                    title=f"จำนวนสัตว์แต่ละประเภท (Last {hours}H)",
+                    title=f"Animal Count By Type (Last {hours}H)",
                     color=counts,
                     color_continuous_scale="viridis",
                     text=counts
@@ -301,9 +301,9 @@ class RealDataDashboard:
                 st.warning("No data available for bar chart")
         
         with col2:
-            # Pie chart จากข้อมูลจริง
+            # Pie chart from real data
             if animal_counts:
-                # กรองเฉพาะสัตว์ที่มีจำนวน > 0
+                # Filter only animals with counts > 0.
                 filtered_data = {k: v for k, v in animal_counts.items() if v > 0}
                 
                 if filtered_data:
@@ -313,7 +313,7 @@ class RealDataDashboard:
                     fig_pie = px.pie(
                         values=values,
                         names=names,
-                        title=f"สัดส่วนสัตว์ที่ตรวจพบ (Last {hours}H)"
+                        title=f"Animal Distributions (Last {hours}H)"
                     )
                     fig_pie.update_layout(
                         height=400,
@@ -327,11 +327,11 @@ class RealDataDashboard:
             else:
                 st.warning("No data available for pie chart")
         
-        # Time series chart จากข้อมูลจริง
+        # Time series chart from real data
         st.subheader(f"📅 Detection Trends Over Time (Last {hours} Hours)")
         
         if not df.empty:
-            # สร้าง time series chart
+            # build time series chart
             fig_time = go.Figure()
             
             colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#fef65b', '#ff9ff3', '#54a0ff']
@@ -351,9 +351,9 @@ class RealDataDashboard:
                     ))
             
             fig_time.update_layout(
-                title=f"การตรวจจับสัตว์ตลอดเวลา (Last {hours} Hours)",
-                xaxis_title="เวลา",
-                yaxis_title="จำนวนสัตว์",
+                title=f"Animal Count By Type (Last {hours} Hours)",
+                xaxis_title="Time",
+                yaxis_title="Count",
                 height=400,
                 hovermode='x unified',
                 plot_bgcolor='rgba(0,0,0,0)',
@@ -364,10 +364,10 @@ class RealDataDashboard:
         else:
             st.warning("No time series data available")
         
-        # แสดงข้อมูลล่าสุด
+        # update present data
         if not df.empty:
             with st.expander("📋 Recent Detection Data"):
-                # แสดง 10 records ล่าสุด
+                # show last 10 records
                 recent_data = df.sort_values('time', ascending=False).head(10)
                 recent_data['thai_name'] = recent_data['animal_type'].map(
                     lambda x: self.animals_data.get(x, {}).get('thai_name', x)
@@ -379,7 +379,7 @@ class RealDataDashboard:
                 st.dataframe(display_df, use_container_width=True)
     
     def show_system_performance(self, hours):
-        """แสดงข้อมูล performance ของระบบ"""
+        """Display system performance information"""
         st.subheader("⚡ System Performance Metrics")
         
         try:
@@ -437,13 +437,13 @@ class RealDataDashboard:
             st.error(f"Error loading performance data: {e}")
     
     def show_database_info(self):
-        """แสดงข้อมูล database และ COCO classes"""
+        """Display database information and COCO classes"""
         st.subheader("ℹ️ System Information")
         
         col1, col2 = st.columns(2)
         
         with col1:
-            st.info("**COCO Classes ที่ใช้งาน:**")
+            st.info("**COCO Classes in use:**")
             for name, data in self.animals_data.items():
                 st.write(f"🔹 **Class {data['coco_id']}**: {name}")  
         
@@ -455,7 +455,7 @@ class RealDataDashboard:
                 st.write(f"🏢 Organization: {self.db.org}")
                 st.write(f"🌐 URL: {self.db.db_config['url']}")
                 
-                # แสดงข้อมูลการเชื่อมต่อล่าสุด
+                # Show latest connection information
                 current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 st.write(f"🕐 Last Update: {current_time}")
             else:
@@ -464,7 +464,7 @@ class RealDataDashboard:
                 st.write("📝 Showing sample data instead")
 
 def run_dashboard():
-    """รันแดชบอร์ด"""
+    """Run Dashboard"""
     try:
         dashboard = RealDataDashboard()
         dashboard.run()
