@@ -7,15 +7,15 @@ from datetime import datetime
 
 class SimpleAnimalDetector:
     def __init__(self, config_path="config/config.yaml"):
-        # โหลด configuration
+        # load configuration
         with open(config_path, 'r', encoding='utf-8') as file:
             self.config = yaml.safe_load(file)
         
-        # โหลดโมเดล
+        # load model
         self.model = YOLO(self.config['model']['path'])
         self.confidence_threshold = self.config['model']['confidence_threshold']
         
-        # สร้าง animal mapping จาก COCO classes
+        # build animal mapping from COCO classes
         self.animal_classes = {}
         self.colors = {}
         self.coco_ids = set()
@@ -30,12 +30,12 @@ class SimpleAnimalDetector:
         for name, display_name in self.animal_classes.items():
             print(f"   - {name}")
 
-        # ตัวแปรสำหรับนับสัตว์
+        # Variables for counting animals
         self.current_counts = defaultdict(int)
         self.max_counts = defaultdict(int)
         
     def detect_frame(self, frame):
-        """ตรวจจับสัตว์ใน 1 frame"""
+        """Detect animals in 1 frame"""
         results = self.model(frame, conf=self.confidence_threshold)
         
         detections = []
@@ -49,12 +49,12 @@ class SimpleAnimalDetector:
                     class_id = int(box.cls[0])
                     class_name = self.model.names[class_id]
                     
-                    # ตรวจสอบว่าเป็นสัตว์ที่เราต้องการไหม (COCO ID 17-23)
+                    # Check if it is the animal we want. (COCO ID 17-23)
                     if class_id in self.coco_ids and class_name in self.animal_classes:
-                        # นับสัตว์ใน frame
+                        # Count the animals in the frame
                         frame_counts[class_name] += 1
                         
-                        # เก็บข้อมูล detection
+                        # Collect detection data
                         detections.append({
                             'class_name': class_name,
                             'display_name': self.animal_classes[class_name],
@@ -64,7 +64,7 @@ class SimpleAnimalDetector:
                             'timestamp': datetime.now()
                         })
 
-        # อัปเดตจำนวนสูงสุด
+        # Update maximum number
         for animal, count in frame_counts.items():
             self.max_counts[animal] = max(self.max_counts[animal], count)
         
@@ -83,7 +83,6 @@ class SimpleAnimalDetector:
         
             cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
         
-            # แสดงแค่ชื่ออังกฤษ
             label = f"{class_name}: {confidence:.1%}"
         
             (text_width, text_height), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)
@@ -129,7 +128,7 @@ class SimpleAnimalDetector:
         return frame
     
     def get_summary(self):
-        """ส่งคืนสรุปการนับสัตว์"""
+        """Return animal count summary"""
         return {
             'current_counts': dict(self.current_counts),
             'max_counts': dict(self.max_counts),
