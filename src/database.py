@@ -10,7 +10,7 @@ THAILAND_TZ = pytz.timezone('Asia/Bangkok')
 class SimpleInfluxDB:
     def __init__(self, config_path="config/config.yaml"):
         """Initialize InfluxDB connection"""
-        # โหลด configuration
+        # load configuration
         if not os.path.exists(config_path):
             raise FileNotFoundError(f"Config file not found: {config_path}")
             
@@ -19,7 +19,7 @@ class SimpleInfluxDB:
         
         self.db_config = config['influxdb']
         
-        # สร้าง InfluxDB client
+        # build InfluxDB client
         try:
             self.client = InfluxDBClient(
                 url=self.db_config['url'],
@@ -44,7 +44,7 @@ class SimpleInfluxDB:
         return self.client is not None
     
     def save_animal_counts(self, animal_counts, source="camera_1", location="detection_area"):
-        """บันทึกจำนวนสัตว์แต่ละประเภท"""
+        """Record the number of each type of animal."""
         if not self.is_connected():
             print("InfluxDB not connected, skipping save")
             return False
@@ -58,7 +58,7 @@ class SimpleInfluxDB:
         points = []
         
         try:
-            # บันทึกจำนวนแต่ละประเภทสัตว์
+            # Record the number of each type of animal.
             for animal_type, count in animal_counts.items():
                 point = Point("animal_counts") \
                     .tag("animal_type", animal_type) \
@@ -69,7 +69,7 @@ class SimpleInfluxDB:
                     .time(timestamp)
                 points.append(point)
             
-            # บันทึกจำนวนรวมทั้งหมด
+            # Record the total amount.
             total_count = sum(animal_counts.values())
             total_point = Point("total_animals") \
                 .tag("source", source) \
@@ -79,7 +79,7 @@ class SimpleInfluxDB:
                 .time(timestamp)
             points.append(total_point)
             
-            # เขียนข้อมูลลง database
+            # Write data to database
             self.write_api.write(bucket=self.bucket, org=self.org, record=points)
             
             return True
@@ -89,7 +89,7 @@ class SimpleInfluxDB:
             return False
     
     def save_detection_details(self, detections, source="camera_1", location="detection_area"):
-        """บันทึกรายละเอียดการตรวจจับแต่ละตัว"""
+        """Record details of each detection."""
         if not self.is_connected() or not detections:
             return False
         
@@ -120,7 +120,7 @@ class SimpleInfluxDB:
             return False
     
     def save_system_performance(self, fps, processing_time, frame_count, source="camera_1"):
-        """บันทึกข้อมูล performance ของระบบ"""
+        """Record system performance data"""
         if not self.is_connected():
             return False
         
@@ -141,7 +141,7 @@ class SimpleInfluxDB:
             return False
     
     def get_animal_history(self, hours=1, animal_type=None):
-        """ดึงประวัติการนับสัตว์"""
+        """Pull animal count history"""
         if not self.is_connected():
             return None
         
@@ -175,7 +175,7 @@ class SimpleInfluxDB:
             return None
     
     def get_total_history(self, hours=1):
-        """ดึงประวัติจำนวนสัตว์รวม"""
+        """Pull the total number of animals history"""
         if not self.is_connected():
             return None
         
@@ -197,7 +197,7 @@ class SimpleInfluxDB:
             return None
     
     def get_detection_summary(self, hours=24):
-        """ดึงสรุปการตรวจจับใน x ชั่วโมงที่ผ่านมา"""
+        """Pull up a summary of detections in the last x hours."""
         if not self.is_connected():
             return None
         
@@ -219,7 +219,7 @@ class SimpleInfluxDB:
             return None
     
     def get_performance_stats(self, hours=1):
-        """ดึงสถิติ performance ของระบบ"""
+        """Pull system performance statistics"""
         if not self.is_connected():
             return None
         
@@ -241,12 +241,12 @@ class SimpleInfluxDB:
             return None
     
     def test_connection(self):
-        """ทดสอบการเชื่อมต่อ database"""
+        """Test database connection"""
         if not self.is_connected():
             return False
         
         try:
-            # ลองเขียนข้อมูลทดสอบ
+            # Test database connection
             test_point = Point("connection_test") \
                 .field("test_value", 1) \
                 .time(datetime.now(timezone.utc))
@@ -260,7 +260,7 @@ class SimpleInfluxDB:
             return False
     
     def close(self):
-        """ปิดการเชื่อมต่อ"""
+        """Close connection"""
         if self.client:
             self.client.close()
             print(" InfluxDB connection closed")
