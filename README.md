@@ -1,5 +1,7 @@
 # Animals Detection-DeepLearning
 
+LinkedIn Post : [https://www.linkedin.com/feed/update/urn:li:activity:7371604041354874881/]
+
 A real-time animal detection system using YOLOv8n deep learning model for detecting 7 COCO animal classes: Horse, Sheep, Cow, Elephant, Bear, Zebra, and Giraffe. The system provides live detection with bounding boxes, animal counting, data storage in InfluxDB, and real-time dashboard visualization.
 
 ## System Architecture
