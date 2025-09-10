@@ -36,7 +36,7 @@ The system can detect and classify the following 7 animal types with bounding bo
 ![alt text](data/images/for_readme/test_horse.png)
 
 ```
-Detection: Horse - Confidence: 89%
+Detection: Horse
 COCO ID: 17
 ```
 
@@ -45,8 +45,7 @@ COCO ID: 17
 ![alt text](data/images/for_readme/test_sheep.png)
 
 ```
-[Example image showing sheep detection with bounding box]
-Detection: Sheep - Confidence: 92%
+Detection: Sheep
 COCO ID: 18
 ```
 
@@ -55,8 +54,7 @@ COCO ID: 18
 ![alt text](data/images/for_readme/test_cow.png)
 
 ```
-[Example image showing cow detection with bounding box]
-Detection: Cow - Confidence: 94%
+Detection: Cow
 COCO ID: 19
 ```
 
@@ -65,8 +63,7 @@ COCO ID: 19
 ![alt text](data/images/for_readme/test_elephant.png)
 
 ```
-[Example image showing elephant detection with bounding box]
-Detection: Elephant - Confidence: 96%
+Detection: Elephant
 COCO ID: 20
 ```
 
@@ -75,8 +72,7 @@ COCO ID: 20
 ![alt text](data/images/for_readme/test_bear.png)
 
 ```
-[Example image showing bear detection with bounding box]
-Detection: Bear - Confidence: 88%
+Detection: Bear
 COCO ID: 21
 ```
 
@@ -85,8 +81,7 @@ COCO ID: 21
 ![alt text](data/images/for_readme/test_zebra.png)
 
 ```
-[Example image showing zebra detection with bounding box]
-Detection: Zebra - Confidence: 91%
+Detection: Zebra
 COCO ID: 22
 ```
 
@@ -95,8 +90,7 @@ COCO ID: 22
 ![alt text](data/images/for_readme/test_giraffe.png)
 
 ```
-[Example image showing giraffe detection with bounding box]
-Detection: Giraffe - Confidence: 93%
+Detection: Giraffe
 COCO ID: 23
 ```
 
