@@ -10,15 +10,15 @@
       "horse": 0,
       "sheep": 0,
       "cow": 0,
-      "elephant": 13,
+      "elephant": 15,
       "bear": 0,
       "zebra": 0,
       "giraffe": 0
     },
-    "mae": 0.86,
-    "mape": 15.38,
-    "accuracy": 57.14,
-    "correct_counts": 4,
+    "mae": 0.57,
+    "mape": 0.0,
+    "accuracy": 71.43,
+    "correct_counts": 5,
     "total_classes": 7
   }
 ]

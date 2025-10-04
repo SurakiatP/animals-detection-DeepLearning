@@ -12,7 +12,7 @@ class CountingEvaluator:
         self.results = []
     
     def evaluate_video(self, video_path, ground_truth_counts):
-        """ประเมินความแม่นยำการนับในวิดีโอ"""
+        """Evaluate the counting accuracy in the video"""
         print(f"\nEvaluating: {video_path}")
         
         cap = cv2.VideoCapture(video_path)
@@ -20,7 +20,7 @@ class CountingEvaluator:
             print(f"Cannot open video: {video_path}")
             return None
         
-        # ตัวแปรเก็บจำนวนสูงสุด
+        # Maximum storage variable
         max_counts = defaultdict(int)
         frame_count = 0
         
@@ -32,7 +32,7 @@ class CountingEvaluator:
             # Detect
             detections, counts = self.detector.detect_frame(frame)
             
-            # เก็บค่าสูงสุด
+            # Maximum storage variable
             for animal, count in counts.items():
                 max_counts[animal] = max(max_counts[animal], count)
             
@@ -40,7 +40,7 @@ class CountingEvaluator:
         
         cap.release()
         
-        # คำนวณ metrics
+        # compute metrics
         result = self.calculate_metrics(
             dict(max_counts), 
             ground_truth_counts, 
@@ -51,9 +51,9 @@ class CountingEvaluator:
         return result
     
     def calculate_metrics(self, predicted, ground_truth, video_name):
-        """คำนวณ MAE, MAPE, Accuracy"""
+        """compute MAE, MAPE, Accuracy"""
         
-        # รวม animals ทั้งหมดที่มีใน GT
+        # Includes all animals available in GT.
         all_animals = set(ground_truth.keys())
         
         errors = []
@@ -69,7 +69,7 @@ class CountingEvaluator:
             error = abs(pred_count - gt_count)
             errors.append(error)
             
-            # MAPE (เฉพาะ GT > 0)
+            # MAPE (only GT > 0)
             if gt_count > 0:
                 percentage_errors.append((error / gt_count) * 100)
             
@@ -94,9 +94,9 @@ class CountingEvaluator:
         }
     
     def evaluate_all(self, ground_truth_file):
-        """ประเมินทั้งหมดจาก ground truth file"""
+        """All assessments are based on ground truth files."""
         
-        # โหลด ground truth
+        # load ground truth
         with open(ground_truth_file, 'r') as f:
             all_ground_truths = json.load(f)
         
@@ -104,9 +104,9 @@ class CountingEvaluator:
         print("COUNTING ACCURACY EVALUATION")
         print("="*60)
         
-        # ประเมินแต่ละวิดีโอ
+        # Evaluate each video
         for video_path, gt_counts in all_ground_truths.items():
-            # ถ้าเป็น relative path
+            # if relative path
             if not os.path.isabs(video_path):
                 video_path = os.path.join('data/videos', video_path)
             
@@ -116,14 +116,14 @@ class CountingEvaluator:
             
             self.evaluate_video(video_path, gt_counts)
         
-        # แสดงสรุปผล
+        # display overall
         self.print_summary()
         
-        # บันทึกผลลัพธ์
+        # save results
         self.save_results()
     
     def print_summary(self):
-        """แสดงสรุปผลลัพธ์"""
+        """display resulats"""
         if not self.results:
             print("No results to display")
             return
@@ -146,7 +146,7 @@ class CountingEvaluator:
                 status = "✓" if diff == 0 else "✗"
                 print(f"     {status} {animal:10s}: Predicted={pred:2d}, Ground Truth={gt:2d}, Diff={diff:+3d}")
         
-        # คำนวณค่าเฉลี่ยทั้งหมด
+        # Calculate all averages
         avg_mae = sum(r['mae'] for r in self.results) / len(self.results)
         avg_mape = sum(r['mape'] for r in self.results) / len(self.results)
         avg_accuracy = sum(r['accuracy'] for r in self.results) / len(self.results)
@@ -160,7 +160,7 @@ class CountingEvaluator:
         print("="*60)
     
     def save_results(self, output_file="evaluation/counting_results.json"):
-        """บันทึกผลลัพธ์"""
+        """save results"""
         os.makedirs(os.path.dirname(output_file), exist_ok=True)
         
         with open(output_file, 'w') as f:
@@ -179,6 +179,5 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
     
-    # รันการประเมินผล
     evaluator = CountingEvaluator()
     evaluator.evaluate_all(args.ground_truth)
