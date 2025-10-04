@@ -1,0 +1,24 @@
+[
+  {
+    "video": "test_elephant.mp4",
+    "predicted": {
+      "elephant": 15,
+      "cow": 2,
+      "bear": 2
+    },
+    "ground_truth": {
+      "horse": 0,
+      "sheep": 0,
+      "cow": 0,
+      "elephant": 13,
+      "bear": 0,
+      "zebra": 0,
+      "giraffe": 0
+    },
+    "mae": 0.86,
+    "mape": 15.38,
+    "accuracy": 57.14,
+    "correct_counts": 4,
+    "total_classes": 7
+  }
+]

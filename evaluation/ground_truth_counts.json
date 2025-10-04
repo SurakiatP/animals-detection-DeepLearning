@@ -1,0 +1,11 @@
+{
+  "../../data/videos/test_elephant.mp4": {
+    "horse": 0,
+    "sheep": 0,
+    "cow": 0,
+    "elephant": 15,
+    "bear": 0,
+    "zebra": 0,
+    "giraffe": 0
+  }
+}
