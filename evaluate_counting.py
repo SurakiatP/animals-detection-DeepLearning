@@ -20,7 +20,7 @@ class CountingEvaluator:
             print(f"Cannot open video: {video_path}")
             return None
         
-        # Maximum storage variable
+        # Store maximum counts per animal
         max_counts = defaultdict(int)
         frame_count = 0
         
@@ -29,10 +29,10 @@ class CountingEvaluator:
             if not ret:
                 break
             
-            # Detect
+            # Detect animals in frame
             detections, counts = self.detector.detect_frame(frame)
             
-            # Maximum storage variable
+            # Update maximum counts
             for animal, count in counts.items():
                 max_counts[animal] = max(max_counts[animal], count)
             
@@ -40,7 +40,7 @@ class CountingEvaluator:
         
         cap.release()
         
-        # compute metrics
+        # Calculate metrics
         result = self.calculate_metrics(
             dict(max_counts), 
             ground_truth_counts, 
@@ -51,9 +51,9 @@ class CountingEvaluator:
         return result
     
     def calculate_metrics(self, predicted, ground_truth, video_name):
-        """compute MAE, MAPE, Accuracy"""
+        """Calculate MAE, MAPE, and Accuracy"""
         
-        # Includes all animals available in GT.
+        # Get all animals from ground truth
         all_animals = set(ground_truth.keys())
         
         errors = []
@@ -65,19 +65,20 @@ class CountingEvaluator:
             pred_count = predicted.get(animal, 0)
             gt_count = ground_truth[animal]
             
-            # MAE
+            # Calculate MAE component
             error = abs(pred_count - gt_count)
             errors.append(error)
             
-            # MAPE (only GT > 0)
+            # Calculate MAPE component (only for GT > 0)
             if gt_count > 0:
                 percentage_errors.append((error / gt_count) * 100)
             
-            # Exact match
+            # Check for exact match
             if pred_count == gt_count:
                 correct += 1
             total += 1
         
+        # Calculate final metrics
         mae = sum(errors) / len(errors) if errors else 0
         mape = sum(percentage_errors) / len(percentage_errors) if percentage_errors else 0
         accuracy = (correct / total * 100) if total > 0 else 0
@@ -94,9 +95,9 @@ class CountingEvaluator:
         }
     
     def evaluate_all(self, ground_truth_file):
-        """All assessments are based on ground truth files."""
+        """Evaluate all videos from ground truth file"""
         
-        # load ground truth
+        # Load ground truth data
         with open(ground_truth_file, 'r') as f:
             all_ground_truths = json.load(f)
         
@@ -106,7 +107,7 @@ class CountingEvaluator:
         
         # Evaluate each video
         for video_path, gt_counts in all_ground_truths.items():
-            # if relative path
+            # Handle relative paths
             if not os.path.isabs(video_path):
                 video_path = os.path.join('data/videos', video_path)
             
@@ -116,14 +117,14 @@ class CountingEvaluator:
             
             self.evaluate_video(video_path, gt_counts)
         
-        # display overall
+        # Display summary
         self.print_summary()
         
-        # save results
+        # Save results
         self.save_results()
     
     def print_summary(self):
-        """display resulats"""
+        """Display evaluation results summary"""
         if not self.results:
             print("No results to display")
             return
@@ -143,10 +144,10 @@ class CountingEvaluator:
                 pred = result['predicted'].get(animal, 0)
                 gt = result['ground_truth'][animal]
                 diff = pred - gt
-                status = "✓" if diff == 0 else "✗"
+                status = "[OK]" if diff == 0 else "[MISS]"
                 print(f"     {status} {animal:10s}: Predicted={pred:2d}, Ground Truth={gt:2d}, Diff={diff:+3d}")
         
-        # Calculate all averages
+        # Calculate overall averages
         avg_mae = sum(r['mae'] for r in self.results) / len(self.results)
         avg_mape = sum(r['mape'] for r in self.results) / len(self.results)
         avg_accuracy = sum(r['accuracy'] for r in self.results) / len(self.results)
@@ -160,7 +161,7 @@ class CountingEvaluator:
         print("="*60)
     
     def save_results(self, output_file="evaluation/counting_results.json"):
-        """save results"""
+        """Save evaluation results to JSON file"""
         os.makedirs(os.path.dirname(output_file), exist_ok=True)
         
         with open(output_file, 'w') as f:
@@ -179,5 +180,6 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
     
+    # Run evaluation
     evaluator = CountingEvaluator()
     evaluator.evaluate_all(args.ground_truth)
