@@ -12,6 +12,7 @@ A real-time animal detection system using YOLOv8n deep learning model for detect
 ```
 animal_detection_project/
 ├── main.py                 # Main application
+├── evaluate_counting.py
 ├── requirements.txt        # Dependencies
 ├── README.md              # Documentation
 ├── models/
@@ -26,6 +27,9 @@ animal_detection_project/
 ├── data/
 │   ├── videos/           # Test videos
 │   └── images/           # Test images
+├── evaluation/
+│   ├── counting_results.json
+│   └── ground_truth_counts.json         
 └── output/                # Output videos
 ```
 
